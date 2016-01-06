@@ -58,7 +58,7 @@ static void usage() {
 	fputs("ii - irc it - " VERSION "\n"
 	      "(C)opyright MMV-MMVI Anselm R. Garbe\n"
 	      "(C)opyright MMV-MMXI Nico Golde\n"
-	      "usage: ii [-i <irc dir>] [-s <host>] [-p <port>] [-e ssl]\n"
+	      "usage: ii [-i <irc dir>] [-s <host>] [-d dirname] [-p <port>] [-e ssl]\n"
 	      "          [-n <nick>] [-k <password>] [-f <fullname>]\n", stderr);
 	exit(EXIT_FAILURE);
 }
@@ -497,6 +497,7 @@ int main(int argc, char *argv[]) {
 	struct passwd *spw = getpwuid(getuid());
 	char *key = NULL, *fullname = NULL;
 	char prefix[_POSIX_PATH_MAX];
+	char *dirname = NULL;
 
 	if(!spw) {
 		fputs("ii: getpwuid() failed\n", stderr);
@@ -510,6 +511,7 @@ int main(int argc, char *argv[]) {
 		switch (argv[i][1]) {
 			case 'i': snprintf(prefix,sizeof(prefix),"%s", argv[++i]); break;
 			case 's': host = argv[++i]; break;
+			case 'd': dirname = argv[++i]; break;
 			case 'p': port = strtol(argv[++i], NULL, 10); break;
 			case 'n': snprintf(nick,sizeof(nick),"%s", argv[++i]); break;
 			case 'k': key = getenv(argv[++i]); break;
@@ -518,10 +520,12 @@ int main(int argc, char *argv[]) {
 			default: usage(); break;
 		}
 	}
+	if(!dirname)
+		dirname = host;
 	if(use_ssl)
 		port = port == SERVER_PORT ? SSL_SERVER_PORT : port;
 	irc = tcpopen(port);
-	if(!snprintf(path, sizeof(path), "%s/%s", prefix, host)) {
+	if(!snprintf(path, sizeof(path), "%s/%s", prefix, dirname)) {
 		fputs("ii: path to irc directory too long\n", stderr);
 		exit(EXIT_FAILURE);
 	}
