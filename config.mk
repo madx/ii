@@ -23,5 +23,6 @@ LIBS        = -L${LIBDIR} -L/usr/lib -lc -lssl -lcrypto
 
 # compiler
 CC          = cc
-CFLAGS      = -g -O0 -W -Wall ${INCLUDES} -DVERSION=\"${VERSION}\"
+CFLAGS      = -g -O0 -W -Wall ${INCLUDES} -DVERSION=\"${VERSION}\" \
+              -march=x86-64 -mtune=generic -O2 -pipe -fstack-protector-strong
 LDFLAGS     = ${LIBS}
